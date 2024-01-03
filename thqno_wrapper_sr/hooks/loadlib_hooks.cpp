@@ -20,7 +20,9 @@ FARPROC WINAPI GetProcAddress_hook(
 )
 {
 	auto to_load = hModule;
-	if (lpProcName && lpProcName[0]) {
+	if (lpProcName &&
+		((uint64_t)lpProcName & 0xFFFFFFFF00000000ull) && // proc is a name, not ordinal
+		lpProcName[0]) {
 		if (starts_with_i(lpProcName, "steam")) {
 			to_load = original_hmod;
 			dbg_write("%s() redirecting steam export '%s'", __FUNCTION__, lpProcName);
@@ -47,7 +49,9 @@ NtCreateFile_hook(
 	ULONG EaLength
 )
 {
-	if (ObjectAttributes && ObjectAttributes->ObjectName && ObjectAttributes->ObjectName->Buffer && ObjectAttributes->ObjectName->Buffer[0]) {
+	if (ObjectAttributes && ObjectAttributes->ObjectName &&
+		ObjectAttributes->ObjectName->Length &&
+		ObjectAttributes->ObjectName->Buffer && ObjectAttributes->ObjectName->Buffer[0]) {
 		if (ends_with_i(ObjectAttributes->ObjectName, this_dll_w)) {
 			memcpy_s(
 				(char*)ObjectAttributes->ObjectName->Buffer + ObjectAttributes->ObjectName->Length - (sizeof(this_dll_w) - sizeof(this_dll_w[0])),
