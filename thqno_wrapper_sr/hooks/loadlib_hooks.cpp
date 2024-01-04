@@ -20,7 +20,8 @@ FARPROC WINAPI GetProcAddress_hook(
 )
 {
 	auto to_load = hModule;
-	if (lpProcName &&
+	if ((hModule == this_hmod) &&
+		lpProcName &&
 		((uint64_t)lpProcName & 0xFFFFFFFF00000000ull) && // proc is a name, not ordinal
 		lpProcName[0]) {
 		if (starts_with_i(lpProcName, "steam")) {
