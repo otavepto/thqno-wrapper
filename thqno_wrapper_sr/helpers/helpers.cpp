@@ -7,7 +7,7 @@ const std::wstring get_exe_path()
 	static bool initialized = false;
 	static std::wstring path(4096, L'\0');
 	if (!initialized) {
-		GetModuleFileNameW(GetModuleHandleW(nullptr), &path[0], (DWORD)(path.size() / sizeof(path[0])));
+		GetModuleFileNameW(GetModuleHandleW(nullptr), &path[0], (DWORD)path.size());
 		if (path[0]) {
 			initialized = true;
 			path = path.substr(0, path.find_last_of('\\') + 1);
